@@ -1,6 +1,6 @@
 # PIP5K-Ras-bistability-symmetry-breaking
 
-This repository hosts the code that was developed for the article: _"PIP5K-Ras bistability triggers plasma membrane symmetry breaking to define cellularpolarity and regulate migration"_ (DOI: [10.1101/2024.09.15.613115](https://doi.org/10.1101/2024.09.15.613115)). 
+This repository hosts the code that was developed for the article: _"PIP5K-Ras bistability triggers plasma membrane symmetry breaking to define cellular polarity and regulate migration"_ (DOI: [10.1101/2024.09.15.613115](https://doi.org/10.1101/2024.09.15.613115)). 
 
 Details on the computational simulations and image processing workflows are available in the article's _Methods_ information.
 
