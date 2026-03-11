@@ -37,7 +37,7 @@ The code in the `Image_Analysis` section is implemented in Python 3.10 inside Ub
 
 As long as MATALB and Python are properly set up with the required dependencies, the setup should be completed within a few minutes. 
 
-## Demo and Instructions for use
+## Demo and instructions for use
 
 Please go through the `README.md` files within the subdirectories of the `Computational_Simulations` directory, which contain detailed instructions on how to run the MATLAB programs.
 
