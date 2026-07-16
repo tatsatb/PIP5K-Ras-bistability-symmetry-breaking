@@ -1,6 +1,6 @@
 
 
-function [out1,out2,out3] = kymo_sdefile(t,x,flag,initvalues,SDETYPE,NUMDEPVARS,NUMSIM,p)
+function [out1,out2,out3] = kymo_sdefile(t,x,flag,initvalues,SDETYPE,NUMDEPVARS,NUMSIM,param)
 
 
 % Initial condition
@@ -60,55 +60,56 @@ if nargin < 3 || isempty(flag)
 
   
   
-  p.Tmem = 0.5;
+ 
   
 %--------------------------------------------------------------------------
-    J1_Ras = (p.a1 + p.a2*PKB).*(1 + p.m*Myosin).*Ras;
-    J2_Ras = (p.a3./((p.a4.^2*PIP2.^2 + 1)) + p.a5).*(1 + p.a*(Actin-p.Tmem*Tmem));
+    J1_Ras = (param.a1 + param.a2*PKB).*(1 + param.m*Myosin).*Ras;
+    % J2_Ras = (param.a3./((param.a4.^2*PIP2.^2 + 1)) + param.a5).*(1 + param.a*(Actin-param.Tmem*Tmem));
+    J2_Ras = (param.a3./((param.a4.^2*PIP2.^2 + 1)) + param.a5).*(1 + param.a*Actin - param.Tmem*Tmem);
     
-    drift_Ras  = - J1_Ras + J2_Ras + p.DRas./(p.dx^2)*nabla_SDE(Ras);
-    noise_Ras  = sqrt(J1_Ras + J2_Ras)*p.alpha;
+    drift_Ras  = - J1_Ras + J2_Ras + param.DRas./(param.dx^2)*nabla_SDE(Ras);
+    noise_Ras  = sqrt(J1_Ras + J2_Ras)*param.alpha;
 %--------------------------------------------------------------------------
 
-    J1_PIP2 = (p.b1 + p.b2*Ras).*PIP2;
-    J2_PIP2 = p.b3.*(1 + p.w*PIP5K_mem + 0*p.w*PIP5K_cyto);    
+    J1_PIP2 = (param.b1 + param.b2*Ras).*PIP2;
+    J2_PIP2 = param.b3.*(1 + param.b4*PIP5K_mem);    
     
-    drift_PIP2  = - J1_PIP2 + J2_PIP2 + p.DPIP2./(p.dx^2)*nabla_SDE(PIP2);
-    noise_PIP2  = sqrt(J1_PIP2 + J2_PIP2)*p.alpha;
+    drift_PIP2  = - J1_PIP2 + J2_PIP2 + param.DPIP2./(param.dx^2)*nabla_SDE(PIP2);
+    noise_PIP2  = sqrt(J1_PIP2 + J2_PIP2)*param.alpha;
 %--------------------------------------------------------------------------
-    J1_PKB = p.c1*PKB; 
-    J2_PKB = p.c2*Ras;
+    J1_PKB = param.c1*PKB; 
+    J2_PKB = param.c2*Ras;
 
-    drift_PKB = - J1_PKB + J2_PKB + p.DPKB./(p.dx^2)*nabla_SDE(PKB);
-    noise_PKB  = sqrt(J1_PKB + J2_PKB)*p.alpha;
+    drift_PKB = - J1_PKB + J2_PKB + param.DPKB./(param.dx^2)*nabla_SDE(PKB);
+    noise_PKB  = sqrt(J1_PKB + J2_PKB)*param.alpha;
 %--------------------------------------------------------------------------
 
-    J1_PIP5K = p.d1*PIP5K_mem.*Ras.^2./(p.d2^2+Ras.^2); %Ras(F) releases PI5K(mem)
-    J2_PIP5K = p.d3*PIP5K_cyto;
+    J1_PIP5K = param.d1*PIP5K_mem.*Ras.^2./(param.d2^2+Ras.^2); %Ras(F) releases PI5K(mem)
+    J2_PIP5K = param.d3*PIP5K_cyto;
 
 
-    drift_PIP5K_mem  = - J1_PIP5K + J2_PIP5K + p.DPIP5K_mem./(p.dx^2).*nabla_SDE(PIP5K_mem);
-    drift_PIP5K_cyto =   J1_PIP5K - J2_PIP5K + p.DPIP5K_cyto./(p.dx^2).*nabla_SDE(PIP5K_cyto);
+    drift_PIP5K_mem  = - J1_PIP5K + J2_PIP5K + param.DPIP5K_mem./(param.dx^2).*nabla_SDE(PIP5K_mem);
+    drift_PIP5K_cyto =   J1_PIP5K - J2_PIP5K + param.DPIP5K_cyto./(param.dx^2).*nabla_SDE(PIP5K_cyto);
     
     noise_PI5K_mem   = 0;
     noise_PI5K_cyto  = 0;
 
 %--------------------------------------------------------------------------
 
-    J1_Actin  = p.ac1*Actin;
-    J2_Actin  = p.ac2*PKB;
-    drift_Actin = - J1_Actin + J2_Actin + p.DActin./(p.dx^2)*nabla_SDE(Actin);
-    noise_Actin  = 1*sqrt(J1_Actin + J2_Actin)*p.alpha;
+    J1_Actin  = param.ac1*Actin;
+    J2_Actin  = param.ac2*PKB;
+    drift_Actin = - J1_Actin + J2_Actin + param.DActin./(param.dx^2)*nabla_SDE(Actin);
+    noise_Actin  = 1*sqrt(J1_Actin + J2_Actin)*param.alpha;
 %--------------------------------------------------------------------------
-    J1_Myosin  = p.m1*Myosin;
-    J2_Myosin  = p.m2*PIP2;
-    drift_Myosin = - J1_Myosin + J2_Myosin + p.DMyosin./(p.dx^2)*nabla_SDE(Myosin);
-    noise_Myosin  = 1*sqrt(J1_Myosin + J2_Myosin)*p.alpha;
+    J1_Myosin  = param.m1*Myosin;
+    J2_Myosin  = param.m2*PIP2;
+    drift_Myosin = - J1_Myosin + J2_Myosin + param.DMyosin./(param.dx^2)*nabla_SDE(Myosin);
+    noise_Myosin  = 1*sqrt(J1_Myosin + J2_Myosin)*param.alpha;
 %--------------------------------------------------------------------------
-    J1_Tmem  = 10*0.0125*Tmem;
-    J2_Tmem  = 10*0.0125*mean(PKB);
+    J1_Tmem  = 0.125*Tmem;
+    J2_Tmem  = 0.125*mean(PKB);
     drift_Tmem = - J1_Tmem + J2_Tmem;% p.DTmem./(p.dx^2)*nabla_SDE(Tmem);
-    noise_Tmem  = 0*sqrt(J1_Tmem + J2_Tmem)*p.alpha;
+    noise_Tmem  = 0*sqrt(J1_Tmem + J2_Tmem)*param.alpha;
 %--------------------------------------------------------------------------   
    end
    

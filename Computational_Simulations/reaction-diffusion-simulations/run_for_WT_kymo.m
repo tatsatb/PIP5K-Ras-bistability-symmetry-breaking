@@ -8,101 +8,26 @@
 
     rng(100)
 
-%% Spatial domain
-Rc   = 5;   % radius of cell (um)
-p.Np = 314; % number of spatial point along the perimeter
-p.x = linspace(0,2*pi*Rc,p.Np); 
-p.dx = mean(diff(p.x));   % spatial steps (um)
+%% load parameters
 
+param = param_list;
 
+%% Simulation Time
 
-p.scale_spatial = 0.2424;
-
-%% Time
-p.scaling = 0.95;%1*0.9;
-p.scaling2 = 1;
-p.t0 = 0;   % Length of simulation (s)
-p.tf = 900;   % Length of simulation (s)
-p.dt = 0.001; % s
-t = p.t0:p.dt:p.tf;
+t = param.t0:param.dt:param.tf;
 
  cell_type_list = {'WT'};
  tic
     for k = 1
-         p.cell_type = cell_type_list{k};
-
-%% Parameters
-%--------------------------------------------------------------------------
-% dRas_dt
-%--------------------------------------------------------------------------
-    p.a1 = 0.133*p.scaling*p.scaling2;
-    p.a2 = 2.85*p.scaling*p.scaling2;
-    p.a3 = 1.14*p.scaling*p.scaling2;
-    p.a4 = 1.05*440; %DB
-    p.a5 = 0.0010*p.scaling*p.scaling2;
-%--------------------------------------------------------------------------
-% dPIP2_dt
-%--------------------------------------------------------------------------  
-    p.b1 = 1*0.0144*p.scaling*p.scaling2;
-    p.b2 = 1*2134*p.scaling*p.scaling2;
-    p.b3 = 1*1.7493*p.scaling*p.scaling2; 
-    % p.w  = 1.5*4.2*p.scaling*p.scaling2; % activation of PIP2 by PIP5K (membrane)
-    p.w  = 1.3*4.2*p.scaling*p.scaling2; % activation of PIP2 by PIP5K (membrane)
-%--------------------------------------------------------------------------
-% dPKB_dt 
-%--------------------------------------------------------------------------
-    p.c1 = 0.0744*p.scaling*p.scaling2;
-    p.c2 = 0.8640*p.scaling*p.scaling2;
-%--------------------------------------------------------------------------
-% dPIP5K_dt 
-%--------------------------------------------------------------------------
-    p.d1 = 1*p.scaling*p.scaling2;
-    p.d2 = 0.02;
-    p.d3 = 7.5*0.05*p.scaling*p.scaling2;
-%--------------------------------------------------------------------------
-% dActin_dt 
-%--------------------------------------------------------------------------
-    p.ac1 = 1*0.05*p.scaling*p.scaling2;
-    p.ac2 = 1*0.05*p.scaling*p.scaling2;
-%--------------------------------------------------------------------------
-% dMyosin_dt 
-%--------------------------------------------------------------------------
-    % p.m1  = 0.8*0.05*p.scaling*p.scaling2; 
-    % p.m2  = 0.8*0.05*p.scaling*p.scaling2;
-    p.m1  = 0.8*0.05*p.scaling*p.scaling2; 
-    p.m2  = 0.8*0.05*p.scaling*p.scaling2;
-%--------------------------------------------------------------------------
-% Diffusion coefficients
-%--------------------------------------------------------------------------
-    p.DRas  = 1.2*1.1*0.03*p.scaling*p.scale_spatial*p.scaling2;
-    p.DPIP2 = 1*0.03*p.scaling*p.scale_spatial*p.scaling2;
-    p.DPKB  = 3*0.03*p.scaling*p.scale_spatial*p.scaling2;
-
-    p.DActin  = 2*0.0025*p.scaling*p.scale_spatial*p.scaling2;
-    p.DMyosin = 2*2*0.0025*p.scaling*p.scale_spatial*p.scaling2;
-
-    p.DPIP5K_cyto = 20*0.0025*400*p.scaling*p.scale_spatial*p.scaling2;
-    p.DPIP5K_mem  = 10*10*0.0025*p.scaling*p.scale_spatial*p.scaling2;
-%--------------------------------------------------------------------------
-% Noise p.scaling factor
-%--------------------------------------------------------------------------
-    p.alpha = 1.05*1/12*(1/0.9)*p.scaling;
-
-  p.e1 = 10*0.0125;
-  p.e2 = 10*0.0125;
-%--------------------------------------------------------------------------
+         param.cell_type = cell_type_list{k};
 
 %--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
 
-    switch p.cell_type
+    switch param.cell_type
         case 'WT'
-            p.a = 1.1*0.25*10/10; % Ras activation by Actin: p.a; change if needed
-            p.m = 0.25*6/10;  % Ras inhibition by Myosin: p.m; change if needed
-           
-            p.Tmem = 1.5*0.6250;
-
-       
+            param.a = 0.2750; % Ras activation by Actin: p.a; change if needed
+            param.m = 0.1500;  % Ras inhibition by Myosin: p.m; change if needed
+ 
     end
 %--------------------------------------------------------------------------
 
@@ -110,26 +35,26 @@ t = p.t0:p.dt:p.tf;
 %--------------------------------------------------------------------------
 % nullclines and equilibrium values of Ras, PIP2, PKB, Actin, Myosin
 %--------------------------------------------------------------------------
-    p = nullclines(p); 
+    param = nullclines(param); 
 %--------------------------------------------------------------------------
 % initial values for PIP5K on membrane and in cytosol
 %--------------------------------------------------------------------------
-    switch p.cell_type
+    switch param.cell_type
             case 'WT'
-                p.PIP5K_total = 1*10/126;
-                p.PIP5K_mem0 = 1*9/126;
+                param.PIP5K_total = 0.0794;
+                param.PIP5K_mem0 = 0.0714; % 90% PIP5K are on membrane initially
            
     end
 
 
 
 
-    p.PIP5K_cyto0 = p.PIP5K_total - p.PIP5K_mem0;
+    param.PIP5K_cyto0 = param.PIP5K_total - param.PIP5K_mem0;
 %--------------------------------------------------------------------------
 
-    p.Tmem0 = 0;
+    param.Tmem0 = 0;
 
-    initvalues = [p.Ras0, p.PIP20, p.PKB0, p.PIP5K_mem0, p.PIP5K_cyto0, p.Actin0, p.Myosin0, p.Tmem0]; 
+    initvalues = [param.Ras0, param.PIP20, param.PKB0, param.PIP5K_mem0, param.PIP5K_cyto0, param.Actin0, param.Myosin0, param.Tmem0]; 
     
 
 %% SDE toolbox
@@ -137,46 +62,50 @@ t = p.t0:p.dt:p.tf;
     
     timeRange = t;
     problem = 'kymo'; % name of the sde file
-    numsim  = p.Np; % number of spatial points
+    numsim  = param.Np; % number of spatial points
     sdetype = 'Ito';
     numdepvars = length(initvalues);
-
    
-
-       
-    Output = SDE_euler_deb(initvalues,problem,timeRange,numdepvars,numsim,sdetype,p);
+    Output = SDE_euler_deb(initvalues,problem,timeRange,numdepvars,numsim,sdetype,param);
     
+%% Store sampled data
 
-% Storing the data 
+    T_sampling = round(1/(10*param.dt));   % sample every 0.1 time units
 
-        T_sampling = 1/p.dt/10;
+    speciesNames = {'Ras','PIP2','PKB','PIP5K_mem','PIP5K_cyto','Actin','Myosin','Tmem'};
 
+    for i = 1:numel(speciesNames)
 
-        Ras    = Output(1:T_sampling:end,1:numdepvars:end);
-        PIP2   = Output(1:T_sampling:end,2:numdepvars:end);
-        PKB    = Output(1:T_sampling:end,3:numdepvars:end);
+        S.(speciesNames{i}) = Output(1:T_sampling:end, i:numdepvars:end);
 
+    end
 
-        PIP5K_mem    = Output(1:T_sampling:end,4:numdepvars:end);
-        PIP5K_cyto   = Output(1:T_sampling:end,5:numdepvars:end);
+    Ras        = S.Ras;
+    PIP2       = S.PIP2;
+    PKB        = S.PKB;
+    PIP5K_mem  = S.PIP5K_mem;
+    PIP5K_cyto = S.PIP5K_cyto;
+    Actin      = S.Actin;
+    Myosin     = S.Myosin;
+    Tmem       = S.Tmem;
 
-        Actin    = Output(1:T_sampling:end,6:numdepvars:end);
-        Myosin   = Output(1:T_sampling:end,7:numdepvars:end);
+    T = t(1:T_sampling:end);
 
-        Tmem   = Output(1:T_sampling:end,8:numdepvars:end);
+%% Save kymograph data
 
+        target_folder = '../Kymograph_Data_new';
 
+        if ~exist(target_folder,'dir')
+            mkdir(target_folder);
+        end
 
-        T = t(1:T_sampling:end);
-%% Saving the data
-  % target_folder = '../Kymograph_Data';
-        % if ~exist(target_folder,"dir")
-        %     mkdir(target_folder)
-        % end
-        % filename = fullfile(target_folder,strcat(p.cell_type,'_data.mat'));
-        % 
-        % save(filename,"p","Ras","PIP2","PKB","PIP5K_mem","PIP5K_cyto","Actin","Myosin","T");
+        filename = fullfile(target_folder, sprintf('%s_data.mat', param.cell_type));
 
+        save(filename, ...
+            'param','T', ...
+            'Ras','PIP2','PKB', ...
+            'PIP5K_mem','PIP5K_cyto', ...
+            'Actin','Myosin','Tmem');
     end
         Elapsed_time =  toc;
 
@@ -184,251 +113,126 @@ t = p.t0:p.dt:p.tf;
 
 %% Plot
 
+
 d = 100;
-close all
 T_initial = 0;
+close all
 
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(smoothdata(Ras)',d,1))
+time = T - T_initial;
+xpos = param.x;
+tf_plot = param.tf - T_initial;
+xtick_vals = 0:300:param.tf;
+event_step = 60;
+event_color = 'y-';
 
-colorbar
-clim([0 0.2])
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 (p.tf - T_initial)])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('Time','fontsize',20)
-ylabel('Cell perimeter','fontsize',20)
-title([cell_type_list{k},', Ras Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
+commonFont = 16;
+labelFont = 20;
+lw_axis = 1;
 
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(smoothdata(PIP2,"gaussian")',d,1))
-colorbar
-clim([0 1])
-mycolormap = magma(100);
-colormap(mycolormap)
-% colormap(flipud(sky))
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', PIP2 Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(PIP2)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(PKB',d,1))
-colorbar
-clim([0 1])
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', PKB Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(PKB)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(Actin',d,1))
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', Actin Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-clim([0 0.7])
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(Myosin',d,1))
-% surf(T-T_initial,p.x,circshift(Myosin',d,1),'edgecolor','interp')
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', Myosin Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(Tmem',d,1))
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', Tmem Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(Actin'-Tmem',d,1))
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', Actin - Tmem Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(2*Actin'-Myosin',d,1))
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-% title([cell_type_list{k},', Actin - Myosin Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-clim([-0.25 1.25])
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-sum_Ras = sum(Ras,2);
-sum_PIP5K_mem = sum(PIP5K_mem,2);
+cmap = magma(100);
+
+%% Helper function for kymographs
+plot_kymo = @(data,title_str,clim_vals) local_kymograph( ...
+    time, xpos, data, d, tf_plot, xtick_vals, ...
+    title_str, clim_vals, cmap, event_step, event_color, ...
+    commonFont, labelFont, lw_axis);
+
+%% Kymographs
+plot_kymo(smoothdata(Ras)', ...
+    [cell_type_list{k}, ', Ras Kymograph'], [0 0.2]);
+
+plot_kymo(smoothdata(PIP2,"gaussian")', ...
+    [cell_type_list{k}, ', PIP2 Kymograph'], [0 1]);
+
+plot_kymo(PKB', ...
+    [cell_type_list{k}, ', PKB Kymograph'], [0 1]);
+
+plot_kymo(Actin', ...
+    [cell_type_list{k}, ', Actin Kymograph'], [0 0.7]);
+
+plot_kymo(Myosin', ...
+    [cell_type_list{k}, ', Myosin Kymograph'], []);
+
+plot_kymo(Tmem', ...
+    [cell_type_list{k}, ', Tmem Kymograph'], []);
+
+plot_kymo(Actin' - Tmem', ...
+    [cell_type_list{k}, ', Actin - Tmem Kymograph'], []);
+
+plot_kymo(2*Actin' - Myosin', ...
+    [cell_type_list{k}, ', 2 Actin - Myosin Kymograph'], [-0.25 1.25]);
+
+%% Total PIP5K time series
+sum_Ras        = sum(Ras,2);
+sum_PIP5K_mem  = sum(PIP5K_mem,2);
 sum_PIP5K_cyto = sum(PIP5K_cyto,2);
-total_PIP5K = sum_PIP5K_mem + sum_PIP5K_cyto;
-% plot(T-T_initial,smooth(sum_Ras),'-','LineWidth',2,'Color',[36 136 36]/255)
-h(1) = plot(T-T_initial,total_PIP5K,'-','LineWidth',3,'Color',0.7*[1 1 1]);
-h(2) = plot(T-T_initial,sum_PIP5K_mem,'-','LineWidth',2,'Color',[220, 20, 60]/255);
-h(3) = plot(T-T_initial,sum_PIP5K_cyto,'-.','LineWidth',2,'Color',[0, 150, 255]/255);
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-title([cell_type_list{k},', Total Amount of PIP5K'],'fontsize',20)
-legend(h,{'Total PIP5K','PIP5K mem','PIP5K cyto'},'fontsize',16,'EdgeColor','none')
-xlim([0 p.tf - T_initial])
+total_PIP5K    = sum_PIP5K_mem + sum_PIP5K_cyto;
+
+figure('Color','white')
+set(gca,'FontWeight','normal','LineWidth',lw_axis,'FontSize',commonFont)
+hold on
+
+h(1) = plot(time,total_PIP5K,'-','LineWidth',3,'Color',0.7*[1 1 1]);
+h(2) = plot(time,sum_PIP5K_mem,'-','LineWidth',2,'Color',[220 20 60]/255);
+h(3) = plot(time,sum_PIP5K_cyto,'-.','LineWidth',2,'Color',[0 150 255]/255);
+
+xlim([0 tf_plot])
 ylim([0 40])
+xticks(xtick_vals)
+xticklabels(num2cell(xtick_vals))
 
-%%
-ratio_PIP5K_mem2cyto = (mean(sum_PIP5K_mem)/mean(sum_PIP5K_cyto));
-fprintf('PIP5K ratio membrane to cytosol = %0.2f\n',round(ratio_PIP5K_mem2cyto,2))
+xlabel('Time','FontSize',labelFont)
+title([cell_type_list{k}, ', Total Amount of PIP5K'], ...
+    'FontSize',labelFont,'FontWeight','normal')
 
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(PIP5K_mem',d,1))
-% surf(T-T_initial,p.x,circshift(Myosin',d,1),'edgecolor','interp')
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', PIP5K (membrane) Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
+legend(h,{'Total PIP5K','PIP5K mem','PIP5K cyto'}, ...
+    'FontSize',commonFont,'EdgeColor','none')
+
+%% PIP5K membrane-to-cytosol ratio
+ratio_PIP5K_mem2cyto = mean(sum_PIP5K_mem) / mean(sum_PIP5K_cyto);
+fprintf('PIP5K ratio membrane to cytosol = %0.2f\n', ratio_PIP5K_mem2cyto)
+
+%% PIP5K kymographs
+plot_kymo(PIP5K_mem', ...
+    [cell_type_list{k}, ', PIP5K (membrane) Kymograph'], [0 0.12]);
+
+plot_kymo(PIP5K_cyto', ...
+    [cell_type_list{k}, ', PIP5K (cytosol) Kymograph'], []);
+
+plot_kymo(PIP5K_mem' + PIP5K_cyto', ...
+    [cell_type_list{k}, ', PIP5K Total Kymograph'], ...
+    [0 max(PIP5K_mem(:) + PIP5K_cyto(:))]);
+
+
+%% Local function
+function local_kymograph(time,xpos,data,d,tf_plot,xtick_vals, ...
+    title_str,clim_vals,cmap,event_step,event_color, ...
+    commonFont,labelFont,lw_axis)
+
+    figure('Color','white')
+    set(gca,'FontWeight','normal','LineWidth',lw_axis,'FontSize',commonFont)
+    hold on
+
+    imagesc(time,xpos,circshift(data,d,1))
+    axis xy
+
+    colorbar
+    colormap(cmap)
+
+    if ~isempty(clim_vals)
+        clim(clim_vals)
+    end
+
+    xlim([0 tf_plot])
+    ylim([0 xpos(end)])
+    xticks(xtick_vals)
+    xticklabels(num2cell(xtick_vals))
+
+    xlabel('Time','FontSize',labelFont)
+    ylabel('Cell perimeter','FontSize',labelFont)
+    title(title_str,'FontSize',labelFont,'FontWeight','normal')
+
+    for kk = 1:event_step:length(time)
+        plot([kk kk],[0 xpos(end)],event_color,'LineWidth',1)
+    end
 end
-% clim([0 max(PIP5K_mem(:) + PIP5K_cyto(:))])
-clim([0 0.12])
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(PIP5K_cyto',d,1))
-% surf(T-T_initial,p.x,circshift(Myosin',d,1),'edgecolor','interp')
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', PIP5K (cytosol) Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-% clim([0 max(PIP5K_mem(:) + PIP5K_cyto(:))])
-
-
-%%
-figure('color','white')
-set(gca, 'fontweight','n','linewidth',1,'fontsize',16)
-hold on
-imagesc(T-T_initial,p.x,circshift(PIP5K_mem' + PIP5K_cyto',d,1))
-% surf(T-T_initial,p.x,circshift(Myosin',d,1),'edgecolor','interp')
-colorbar
-colormap(gray)
-mycolormap = magma(100);
-colormap(mycolormap)
-xlim([0 p.tf - T_initial])
-ylim([0 p.x(end)])
-xticks(0:300:p.tf);
-xticklabels(num2cell(0:300:p.tf))
-xlabel('time','fontsize',20)
-ylabel('cell perimeter','fontsize',20)
-title([cell_type_list{k},', PIP5K Total Kymograph'],'fontsize',20,'fontweight','n')
-for kk = 1:60:length(Ras)
-   plot([kk+.1,kk+.1],[0,p.x(end)],'y-');
-end
-clim([0 max(PIP5K_mem(:) + PIP5K_cyto(:))])

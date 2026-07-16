@@ -9,6 +9,7 @@ These filenames are self-explanatory: For example, to obtain the kymograph for t
 
 - `magma.m` – provides the magma colormap.
 - `nabla_SDE.m` – discretization of the spatial derivative.
+- `param_list.m` – central list of model parameters loaded by the `run_for_(phenotype)_kymo.m` scripts.
 - `nullclines.m` – computes the nullclines and equilibrium values of the system.
 - `kymo_sdefile.m`, `kymo2_sdefile.m`, and `SDE_eduler_deb.m` – auxiliary files for the SDE toolbox.
 

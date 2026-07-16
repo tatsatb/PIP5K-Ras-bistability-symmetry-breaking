@@ -72,7 +72,7 @@ if nargin < 3 || isempty(flag)
 %--------------------------------------------------------------------------
 
     J1_PIP2 = (p.b1 + p.b2*Ras).*PIP2;
-    J2_PIP2 = p.b3.*(1 + p.w*PIP5K_mem + 0*p.w*PIP5K_cyto);    
+    J2_PIP2 = p.b3.*(1 + p.b4*PIP5K_mem);    
     
     drift_PIP2  = - J1_PIP2 + J2_PIP2 + p.DPIP2./(p.dx^2)*nabla_SDE(PIP2);
     noise_PIP2  = sqrt(J1_PIP2 + J2_PIP2)*p.alpha;
@@ -106,8 +106,8 @@ if nargin < 3 || isempty(flag)
     drift_Myosin = - J1_Myosin + J2_Myosin + p.DMyosin./(p.dx^2)*nabla_SDE(Myosin);
     noise_Myosin  = 1*sqrt(J1_Myosin + J2_Myosin)*p.alpha;
 %--------------------------------------------------------------------------
-    J1_Tmem  = 10*0.0125*Tmem;
-    J2_Tmem  = 10*0.0125*mean(PKB);
+    J1_Tmem  = 0.125*Tmem;
+    J2_Tmem  = 0.125*mean(PKB);
     drift_Tmem = - J1_Tmem + J2_Tmem;% p.DTmem./(p.dx^2)*nabla_SDE(Tmem);
     noise_Tmem  = 0*sqrt(J1_Tmem + J2_Tmem)*p.alpha;
 %--------------------------------------------------------------------------   
