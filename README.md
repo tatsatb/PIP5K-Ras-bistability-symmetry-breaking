@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22120967.svg)](https://doi.org/10.5281/zenodo.22120967)
 
-This repository hosts the code that was developed for the article: _"PIP5K-Ras bistability triggers plasma membrane symmetry breaking to define cellular polarity and regulate migration"_ (DOI: [10.1101/2024.09.15.613115](https://doi.org/10.1101/2024.09.15.613115)). 
+This repository hosts the code that was developed for the article: _"PIP5K-Ras bistability triggers plasma membrane symmetry breaking to define cellular polarity and regulate migration"_ (DOI: [10.1038/s41467-026-77894-2](https://doi.org/10.1038/s41467-026-77894-2)). 
 
 Details on the computational simulations and image processing workflows are available in the article's _Methods_ information.
 
@@ -54,12 +54,12 @@ The code in this repository was developed by Debojyoti Biswas, Tatsat Banerjee, 
 
 This program is a free and open-source software (please see the [License](#license) information below for details). However, if you are using this code in your work, please cite our work as:
 
-> Yu Deng, Tatsat Banerjee, Satomi Matsuoka, Debojyoti Biswas, Liz A Kurtz, Jane Borleis, Yu Long, Parijat Banerjee, Huiwang Zhan, Dhiman Sankar Pal, Nathan H Roy, Masahiro Ueda, Pablo A Iglesias, Peter N Devreotes. “_PIP5K-Ras bistability triggers plasma membrane symmetry breaking to define cellular polarity and regulate migration_”, bioRxiv, 2025, 2024.09.15.613115 DOI: [10.1101/2024.09.15.613115](https://doi.org/10.1101/2024.09.15.613115). 
+> Yu Deng, Tatsat Banerjee, Satomi Matsuoka, Debojyoti Biswas, Liz A Kurtz, Jane Borleis, Yu Long, Parijat Banerjee, Huiwang Zhan, Dhiman Sankar Pal, Nathan H Roy, Masahiro Ueda, Pablo A Iglesias, Peter N Devreotes. “_PIP5K-Ras bistability triggers plasma membrane symmetry breaking to define cellular polarity and regulate migration_”, Nature Communications, 17, 10963 (2026). DOI: [10.1038/s41467-026-77894-2](https://doi.org/10.1038/s41467-026-77894-2). 
 
 
 ## License
 
-Copyright © 2025 Yu Deng, Tatsat Banerjee, Satomi Matsuoka, Debojyoti Biswas, Liz A Kurtz, Jane Borleis, Yu Long, Parijat Banerjee, Huiwang Zhan, Dhiman Sankar Pal, Nathan H Roy, Masahiro Ueda, Pablo A Iglesias, Peter N Devreotes.
+Copyright © 2026 Yu Deng, Tatsat Banerjee, Satomi Matsuoka, Debojyoti Biswas, Liz A Kurtz, Jane Borleis, Yu Long, Parijat Banerjee, Huiwang Zhan, Dhiman Sankar Pal, Nathan H Roy, Masahiro Ueda, Pablo A Iglesias, Peter N Devreotes.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
